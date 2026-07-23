@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解析力学 補足ノート</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg: #fbfaf7;
+    --panel: #ffffff;
+    --ink: #26241f;
+    --sub: #6b6558;
+    --line: #e4e0d6;
+    --accent: #7a5c3e;
+    --accent-soft: #efe6d8;
+    --code-bg: #f4f1ea;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body{
+    margin:0;
+    font-family: "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP", serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.9;
+    display: flex;
+    min-height: 100vh;
+  }
+  /* Sidebar TOC */
+  nav.toc{
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 36px 26px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.toc h2{
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--sub);
+    text-transform: uppercase;
+    margin: 0 0 18px 0;
+    font-weight: 600;
+  }
+  nav.toc ol{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: toc-counter;
+  }
+  nav.toc li{
+    counter-increment: toc-counter;
+    margin-bottom: 4px;
+  }
+  nav.toc a{
+    display: flex;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.92rem;
+    padding: 7px 8px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+  }
+  nav.toc a:hover{ background: var(--accent-soft); }
+  nav.toc a::before{
+    content: counter(toc-counter, decimal-leading-zero);
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  nav.toc .title{
+    font-family: "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP", serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  nav.toc .subtitle{
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.8rem;
+    color: var(--sub);
+    margin-bottom: 26px;
+  }
+
+  /* Main content */
+  main{
+    flex: 1;
+    max-width: 860px;
+    padding: 56px 64px 120px;
+  }
+  header.doc-header{
+    margin-bottom: 56px;
+    padding-bottom: 28px;
+    border-bottom: 2px solid var(--ink);
+  }
+  header.doc-header h1{
+    font-size: 2.4rem;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  header.doc-header p{
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    color: var(--sub);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  section.chapter{
+    margin-bottom: 70px;
+    scroll-margin-top: 30px;
+  }
+  section.chapter h2{
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--ink);
+    border-left: 5px solid var(--accent);
+    padding-left: 16px;
+    margin: 0 0 28px 0;
+  }
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 30px;
+    margin-bottom: 22px;
+  }
+  .card h3{
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 0 0 14px 0;
+    color: var(--ink);
+  }
+  .card p, section.chapter > p { margin: 0 0 12px 0; }
+  .card ul, .card ol { margin: 8px 0 12px 0; padding-left: 1.4em; }
+  .card li { margin-bottom: 6px; }
+  .note{
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.9rem;
+    color: var(--sub);
+    margin: 14px 0;
+  }
+  .highlight{
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  strong { color: var(--accent); }
+  table{
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0 18px 0;
+    font-size: 0.92rem;
+  }
+  th, td{
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th{
+    background: var(--code-bg);
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-weight: 600;
+  }
+  .flowbox{
+    background: #2b2a26;
+    color: #f1ede2;
+    border-radius: 8px;
+    padding: 18px 22px;
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    margin: 16px 0;
+  }
+  .flowbox b{ color: #e8c9a0; }
+  mjx-container{ overflow-x: auto; overflow-y: hidden; }
+  .backlink{
+    display: inline-block;
+    margin-top: 6px;
+    font-family: "Hiragino Sans","Noto Sans JP", sans-serif;
+    font-size: 0.78rem;
+    color: var(--sub);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--sub);
+  }
+  @media (max-width: 900px){
+    body{ flex-direction: column; }
+    nav.toc{ width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--line); }
+    main{ padding: 36px 22px 90px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="toc">
+  <div class="title">解析 補足</div>
+  <div class="subtitle">解析力学ノート・目次</div>
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#ch1">オイラーラグランジュ</a></li>
+    <li><a href="#ch2">ルジャンドル変換, 正準変換</a></li>
+    <li><a href="#ch3">H(x,p,t) = px&#775; − L の補足</a></li>
+    <li><a href="#ch4">正準変換とは</a></li>
+    <li><a href="#ch5">母関数とは</a></li>
+    <li><a href="#ch6">係数比較</a></li>
+    <li><a href="#ch7">ポアソン括弧と判定条件</a></li>
+    <li><a href="#ch8">5問目の解説 詳細</a></li>
+    <li><a href="#ch9">問6</a></li>
+    <li><a href="#ch10">7問目</a></li>
+    <li><a href="#ch11">8問目 例題3-1 もっと楽に</a></li>
+    <li><a href="#ch12">母関数の使い方</a></li>
+    <li><a href="#ch13">例題3.2</a></li>
+    <li><a href="#ch14">微小正準変換の考え方</a></li>
+    <li><a href="#ch15">問題15 回転の生成子 補足</a></li>
+    <li><a href="#ch16">問16 ネーターの定理① 補足</a></li>
+    <li><a href="#ch17">ネーターの定理① ポアソン括弧版</a></li>
+    <li><a href="#ch18">ハミルトンヤコビ方程式</a></li>
+    <li><a href="#ch19">問19 演習問題1</a></li>
+    <li><a href="#ch20">問20,21 例題4-2 補足</a></li>
+    <li><a href="#ch21">問22 ヤコビアン 補足</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<header class="doc-header">
+  <h1>解析 補足</h1>
+  <p>解析力学（ラグランジュ形式・ハミルトン形式・正準変換）に関する補足解説ノート</p>
+</header>
+
+<!-- 1 -->
+<section class="chapter" id="ch1">
+  <h2>オイラーラグランジュ</h2>
+  <div class="card">
+    <p>「本当にこれで合ってるの？」を確認するために、最も単純な1次元の自由粒子（\(T = \frac{1}{2}m\dot{x}^2, V=V(x)\)）で考えてみましょう。</p>
+    $$ L = T - V = \frac{1}{2}m\dot{x}^2 - V(x) $$
+    <p>この \(L\) を方程式の各パーツに当てはめてみます。</p>
+    <ul>
+      <li><strong>右辺</strong>：\(\dfrac{\partial L}{\partial x} = -\dfrac{\partial V}{\partial x} = F\)（位置で微分すると「力」になります）</li>
+      <li><strong>左辺のカッコ内</strong>：\(\dfrac{\partial L}{\partial \dot{x}} = m\dot{x} = p\)（速度で微分すると「運動量」になります）</li>
+      <li><strong>左辺全体</strong>：\(\dfrac{d}{dt}(m\dot{x}) = m\ddot{x} = ma\)（運動量を時間微分するので「質量×加速度」になります）</li>
+    </ul>
+    <p>これらをオイラー・ラグランジュ方程式に代入すると、</p>
+    $$ ma = F $$
+    <p>となり、見事にニュートンの運動方程式と一致します。</p>
+    <p>つまり、この方程式は「物体はエネルギーのバランス（作用）が最も最適化されるルートを飛ぶ」という原則を、数学的に削り出した結果なのです。</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="chapter" id="ch2">
+  <h2>ルジャンドル変換, 正準変換</h2>
+
+  <div class="card">
+    <h3>1. 何のために何をしているのか？（変数のバトンタッチ）</h3>
+    <p>これまで使っていたラグランジアン \(L(x,\dot{x},t)\) では、物体の状態を「位置 \(x\)」と「速度 \(\dot{x}\)」をベースに考えていました。</p>
+    <p>しかし、ここから先（ハミルトン力学）では、「速度 \(\dot{x}\)」の代わりに「運動量 \(p\)」を主役にしたいと考えます。その方が、のちのち量子力学や統計力学に繋がるときに圧倒的に都合が良いからです。</p>
+    <ul>
+      <li><strong>やりたいこと</strong>：\((x,\dot{x})\) の世界から、\((x,p)\) の世界へ引っ越したい。</li>
+      <li><strong>引っ越しのルール</strong>：運動量の定義 \(p = \dfrac{\partial L}{\partial \dot{x}}\) を使って、速度 \(\dot{x}\) を運動量 \(p\) の式に書き換える。</li>
+    </ul>
+    <p>この変数を「速度」から「運動量」へガチッと変換する手続きのことを「ルジャンドル変換」と呼びます。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. ハミルトニアンの定義式</h3>
+    <p>引っ越し先での新しいエネルギーの基準となるのがハミルトニアン \(H\) です。以下の式で定義されます。</p>
+    $$ H(x,p,t) = p\dot{x} - L(x,\dot{x},t) $$
+    <div class="highlight">
+      <p>💡 ここがポイント<br>
+      左辺のハミルトニアン \(H\) の中身（引数）は \((x,p,t)\) になっています。つまり、右辺に残っている \(\dot{x}\) を、無理矢理にでも \(p\) を使った式に置き換えて、「\(\dot{x}\) を完全に消し去った式」にする必要があります。<br>
+      ※多くの場合、このハミルトニアン \(H\) はシステムの「全エネルギー（運動エネルギー＋ポテンシャルエネルギー）」を表すことになります。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. 引っ越した結果得られる「正準方程式」</h3>
+    <p>ラグランジアンの全微分やオイラー・ラグランジュ方程式（これまでの運動方程式）を組み合わせて、このハミルトニアン \(H\) を微分して整理すると、驚くほど綺麗なペアの式（対称性のある式）が導き出されます。それがハミルトンの正準方程式です。</p>
+    $$ \dot{x} = \frac{\partial H}{\partial p}, \quad \dot{p} = -\frac{\partial H}{\partial x} $$
+    <p>これは「今後のすべての問題で当たり前のように使われる道具」と書かれている通り、ハミルトン力学における新しい「運動方程式」です。これさえあれば、物体のこれからの動き（位置の変化 \(\dot{x}\) と、運動量の変化 \(\dot{p}\)）を完全に追跡できます。</p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="chapter" id="ch3">
+  <h2>H(x,p,t) = p\(\dot{x}\) − L(x,\(\dot{x}\),t) の補足</h2>
+  <div class="card">
+    <p>多くの単純な物理システムにおいて、ラグランジアン \(L\) は「運動エネルギー \(T\) − ポテンシャルエネルギー \(V\)」で表されます。</p>
+    $$ L = T - V $$
+    <p>ここで、運動エネルギー \(T\) が速度 \(\dot{x}\) の2乗に比例する一般的なケース（\(T=\frac{1}{2}m\dot{x}^2\)）を考えてみましょう。このとき、一般化運動量 \(p\) の定義は次のようになります。</p>
+    $$ p = \frac{\partial L}{\partial \dot{x}} = \frac{\partial T}{\partial \dot{x}} = m\dot{x} $$
+    <p>では、定義式にある \(p\dot{x}\) という塊を計算してみます。</p>
+    $$ p\dot{x} = (m\dot{x})\dot{x} = m\dot{x}^2 = 2T $$
+    <p>なんと、運動エネルギーの2倍（\(2T\)）になります。これをハミルトニアンの定義式に代入してみると……</p>
+    $$ H = p\dot{x} - L = 2T - (T-V) = T + V $$
+    $$ H = \text{運動エネルギー} + \text{ポテンシャルエネルギー} = \text{全エネルギー} $$
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="chapter" id="ch4">
+  <h2>正準変換とは</h2>
+
+  <div class="card">
+    <h3>1. 正準変換とは何か？（ルールを破らない着せ替え）</h3>
+    <p>普通、変数を全く別のもの（例えば \(x \to X, p \to P\)）にガラッと変えてしまうと、せっかく苦労して導いたあの綺麗な「正準方程式」の形は崩れてしまいます。</p>
+    <p>しかし、世の中には「変数を新しくしても、運動方程式（正準方程式）の美しい形がそのままキープされる特別な変換」が存在します。</p>
+    <ul>
+      <li>元の世界 \((x,p)\)：\(\dot{x}=\dfrac{\partial H}{\partial p}, \ \dot{p}=-\dfrac{\partial H}{\partial x}\)</li>
+      <li>新しい世界 \((X,P)\)：\(\dot{X}=\dfrac{\partial H'}{\partial P}, \ \dot{P}=-\dfrac{\partial H'}{\partial X}\)</li>
+    </ul>
+    <p>このように、引っ越し先でも全く同じフォーム（片方にだけマイナスがつく形）が成り立つような、ハミルトン力学のルールを壊さない合法的な変数変換のことを「正準変換」と呼びます。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. なぜそんなことを考えるのか？（最大の動機）</h3>
+    <p>理由はシンプルで、「計算をめちゃくちゃ楽にしたいから」です。</p>
+    <p>物理の問題を解くとき、座標の選び方によって難易度が激変することがありますよね（例えば、円運動を解くときに \(x,y\) 座標のまま頑張るより、極座標 \(r,\theta\) に変えた方が圧倒的に楽になるようなイメージです）。</p>
+    <p>正準変換をうまく使って、新しいハミルトニアン \(H'\) を「めちゃくちゃ簡単な形（例えば \(P\) だけの関数、あるいは0）」に持ち込むことができれば勝ちです。</p>
+    <div class="highlight">
+      <p>💡 例えば \(H'=0\) にできた場合どうなる？<br>
+      新しい正準方程式に \(H'=0\) を代入してみると、</p>
+      <ul>
+        <li>\(\dot{X} = \dfrac{\partial (0)}{\partial P} = 0 \ \to\ X\) は定数（ずっと変化しない）</li>
+        <li>\(\dot{P} = -\dfrac{\partial (0)}{\partial X} = 0 \ \to\ P\) は定数（ずっと変化しない）</li>
+      </ul>
+      <p>となり、運動方程式を解くまでもなく「新しい変数 \(X,P\) はどっちも時間が経っても変化しない定数だ！」と分かってしまいます。あとは初期条件をポンと入れるだけで、積分するだけで一瞬で解けてしまうわけです。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. この先のストーリー（ハミルトン・ヤコビ方程式への伏線）</h3>
+    <p>「じゃあ、どんな問題に対しても、ハミルトニアンを一番簡単な形（定数）にできちゃうような、最強の正準変換を自動的に見つけ出す方法ってないの？」という疑問に対する答え（ゴール）です。</p>
+    <p>その最強の変換を探し出すための微分方程式こそが、この先で習う「ハミルトン・ヤコビ方程式」になります。</p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="chapter" id="ch5">
+  <h2>母関数とは</h2>
+
+  <div class="card">
+    <h3>1. 母関数とは何か？（新旧の世界を繋ぐ架け橋）</h3>
+    <p>古い変数 \((x,p)\) から新しい変数 \((X,P)\) へ正準変換したいとき、「適当に決めた変換」では正準変換の形が崩れてしまうのでしたね。</p>
+    <p>そこで、「この関数を微分して変換式を作れば、絶対に正準変換になりますよ」という保証書付きの関数を用意します。それが「母関数」です。</p>
+    <p>母関数は、古い変数から1つ、新しい変数から1つを引っ張ってきて、それらをドッキングさせた関数として定義します。新旧の変数を繋ぐ「架け橋」のような存在だからこそ、微分するだけで新旧の変換式が自動的に湧き出てくるのです。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. なぜ4パターンもあるのか？（組み合わせの問題）</h3>
+    <p>\(W, W', W'', W'''\) と4種類並んでいますが、これは難しく考える必要はありません。「古い変数（\(x\) か \(p\)）」×「新しい変数（\(X\) か \(P\)）」の組み合わせが \(2\times2=4\) 通りあるだけです。</p>
+    <p>教科書によっては \(F_1, F_2, F_3, F_4\) と書かれることもありますが、中身は完全に同じです。</p>
+    <table>
+      <tr><th>種類</th><th>独立変数（選んだ変数のペア）</th><th>特徴</th></tr>
+      <tr><td>第1基本型（\(W\) または \(F_1\)）</td><td>古い座標 \(x\) と、新しい座標 \(X\)</td><td>座標同士をペアにする王道パターン</td></tr>
+      <tr><td>第2基本型（\(W'\) または \(F_2\)）</td><td>古い運動量 \(p\) と、新しい座標 \(X\)</td><td>実戦（ハミルトン・ヤコビ方程式など）で最もよく使う形</td></tr>
+      <tr><td>第3基本型（\(W''\) または \(F_3\)）</td><td>古い座標 \(x\) と、新しい運動量 \(P\)</td><td>あまり出番はないが、組み合わせ上存在する</td></tr>
+      <tr><td>第4基本型（\(W'''\) または \(F_4\)）</td><td>古い運動量 \(p\) と、新しい運動量 \(P\)</td><td>運動量同士をペアにするパターン</td></tr>
+    </table>
+    <p>どのペアを選んでも、「母関数を微分すれば、選ばなかった残りの変数が求まる」という仕組みになっています。（例：\(W(x,X,t)\) を選んだら、それを \(x\) で微分すると \(p\) が分かり、\(X\) で微分すると \(-P\) が分かる、という自動生成マシーンです）。</p>
+  </div>
+
+  <div class="card">
+    <h3>3. 一番下の文章が言っていること（ハミルトニアンの変化）</h3>
+    <p>「どのパターンでも、新旧のハミルトニアンの関係は \(H' = H + (\text{母関数の}t\text{偏微分})\) です。母関数が \(t\) を陽に含まなければ \(H'=H\) となります。」</p>
+    <p>これは引っ越しをした結果、エネルギー（ハミルトニアン）の値がどう変わるかを説明しています。</p>
+    <ul>
+      <li><strong>時間 \(t\) によって変化する変換（動く座標系への引っ越しなど）の場合</strong>：新しいハミルトニアン \(H'\) は、元の \(H\) に「母関数を時間 \(t\) で微分したもの（\(\partial W/\partial t\) など）」を足して補正する必要があります。</li>
+      <li><strong>時間 \(t\) を直接含まない変換（静的な引っ越し）の場合</strong>：母関数の中に \(t\) という文字が直接登場しなければ、時間微分は0になるので、\(H'=H\) となります。つまり、引っ越しの前後でハミルトニアンの形（全エネルギーの式）は全く変わらないため、非常に扱いやすくなります。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="chapter" id="ch6">
+  <h2>係数比較</h2>
+
+  <div class="card">
+    <h3>1. 「係数比較」の具体的な3ステップ</h3>
+    <p>①〜③の手順は、具体的には以下のような流れで行われます。</p>
+    <ul>
+      <li><strong>①2通りの方法で全微分する</strong><br>
+        例えば、ある関数 \(W\) について、
+        <ul>
+          <li>方法A（定義から）：「物理的な定義式や前提条件」をこねくり回して、なんとか \(dW = \bigcirc dx + \triangle dP\) という式を作ります。</li>
+          <li>方法B（数学のルールから）：\(W(x,P)\) が \(x\) と \(P\) の関数であるという事実だけから、多変数関数の全微分の公式通りに \(dW = \dfrac{\partial W}{\partial x}dx + \dfrac{\partial W}{\partial P}dP\) という式を書きます。</li>
+        </ul>
+      </li>
+      <li><strong>②・③係数を両辺で比較して、関係式を導く</strong><br>
+        方法Aと方法Bで出てきた式は、「同じ \(dW\) を表している全く同じ式」のはずです。だったら、微小量 \(dx\) や \(dP\) の前についている「係数」も絶対に一致するはずですよね。
+        $$ \bigcirc = \frac{\partial W}{\partial x}, \quad \triangle = \frac{\partial W}{\partial P} $$
+        このように見比べるだけで、求めたい物理量の関係式（\(p=\partial W/\partial x\) など）が自動的に手に入ります。
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>2. 熱力学のマクスウェル関係式と同じ、とは？</h3>
+    <p>「熱力学のマクスウェルの関係式を導くときと同じ考え方」というヒントについて。実は、大学の物理において「全微分して係数を比較する」という技が最も大活躍する分野の筆頭が「熱力学」です。</p>
+    <p>熱力学では、内部エネルギー \(U\)、ヘルムホルツの自由エネルギー \(F\)、ギブスの自由エネルギー \(G\) などの関数を全微分し、</p>
+    $$ dU = TdS - PdV $$
+    <p>のような式から、「じゃあ \(T=(\partial U/\partial S)_V\) だな」と係数を比較して新しい関係式を次々と生み出していきます。</p>
+    <p>解析力学のこの章（ルジャンドル変換や母関数）は、数式のいじり方が熱力学と双子のようにそっくりなので、「熱力学のあのやり方と同じだよ」とヒントを出してくれているわけです。</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="chapter" id="ch7">
+  <h2>ポアソン括弧と判定条件</h2>
+
+  <div class="card">
+    <p>問題文で最初から「\(X=\dots\)」「\(P=\dots\)」と変換の式が先にドカンと与えられたとき、それが正準変換なのかどうかを直接チェックする裏ワザについて、3つのポイントに分けて解説します。</p>
+  </div>
+
+  <div class="card">
+    <h3>1. ポアソン括弧（テストの道具）</h3>
+    <p>解析力学で非常によく使う「ポアソン括弧（かっこ）」と呼ばれる計算の定義です。</p>
+    $$ \{X,P\}_{x,p} \equiv \frac{\partial X}{\partial x}\frac{\partial P}{\partial p} - \frac{\partial X}{\partial p}\frac{\partial P}{\partial x} $$
+    <p>一見ややこしそうですが、やることは単純な偏微分の掛け算と引き算です。与えられた新しい変数 \(X,P\) を、それぞれ古い変数 \(x,p\) で偏微分して、この式の通りに「たすき掛け」のように計算します。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. なぜこれが判定条件になるのか？（答えが『1』なら合格）</h3>
+    <p>このテストの合否ラインは非常にシンプルです。</p>
+    <div class="highlight"><p><strong>計算した結果が、きれいに「1」になれば正準変換である（合格）</strong></p></div>
+    <p>もし問題で「この変換が正準変換であることを示せ」と言われたら、上の定義通りに偏微分をガシガシ計算して、最終的に \(=1\) になることを示せば、それだけで証明終了になります。母関数をわざわざ探す必要がないため、問題演習ではめちゃくちゃ重宝する公式です。</p>
+  </div>
+
+  <div class="card">
+    <h3>3. 物理的・数学的な意味</h3>
+    <ul>
+      <li><strong>幾何学的な意味（ヤコビアン）</strong>：このポアソン括弧の計算式は、数学（多変数微積分）で習う「ヤコビアン \(\partial(X,P)/\partial(x,p)\)」と全く同じ形をしています。ヤコビアンとは、変数変換したときに「グラフの面積が何倍に拡大・縮小されるか」を表す倍率です。これが「1」になるということは、「\((x,p)\) の世界から \((X,P)\) の世界へ引っ越しても、相空間の微小な面積がまったく変わらない（保存される）」ということを意味しています（物理ではこれを「リュービルの定理」に関連して学びます）。</li>
+      <li><strong>数学的な意味（完全微分）</strong>：面積の倍率が1になるということは、数学的に「\(dW = pdx - PdX\) という量がちゃんと完全微分（全微分）の形になっている」ことと同値になります。これは正準変換が成り立つための絶対条件です。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="chapter" id="ch8">
+  <h2>5問目の解説 詳細</h2>
+
+  <div class="card">
+    <h3>問題のゴール</h3>
+    <p>母関数の定義式</p>
+    $$ W'' = \sum_i P_i X_i + W(x,X,t) $$
+    <p>（ただし \(-P_i = \dfrac{\partial W}{\partial X_i}\)）からスタートして、\(W''(x,P,t)\) 型の母関数が満たす3つの関係式（\(X_i, p_i, H'\)）を導くこと。</p>
+  </div>
+
+  <div class="card">
+    <h3>証明の全体ストーリー（3ステップ）</h3>
+    <p>この問題は、解析力学の王道テクニックである「ルジャンドル変換（変数のすり替え）」と「係数比較」を組み合わせた綺麗な一本道で解くことができます。</p>
+    <div class="flowbox">
+      <b>【STEP 1】出発点（基本型 dW の全微分）</b><br>
+      └ 正準変換の基本条件 \(dW = \sum p_i dx_i - \sum P_i dX_i - (H-H')dt\) を用意する<br><br>
+      <b>【STEP 2】W'' の全微分と「相殺（すり替え）」</b><br>
+      └ \(W'' = \sum P_i X_i + W\) を全微分すると、\(-\sum P_i dX_i\) が消えて \(\sum X_i dP_i\) に化ける<br><br>
+      <b>【STEP 3】2つの式の「係数比較」</b><br>
+      └ 数学的な全微分式と並べて見比べ、目的の関係式をすべて導出！
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>各ステップの具体的な流れ</h3>
+    <p><strong>STEP1：基本形 dW の形を確認する</strong><br>
+    ハミルトンの作用の原理から、最も基本となる第1基本型 \(W(x,X,t)\) の全微分は次のように書けます。</p>
+    $$ dW = \sum_i p_i dx_i - \sum_i P_i dX_i - (H-H')dt $$
+    <p><strong>ポイント</strong>：\(-(H-H')dt\) は、時間経過に伴う新旧ハミルトニアンの差額（補正項）です。</p>
+
+    <p><strong>STEP2：W'' を全微分して dX_i を消去する</strong><br>
+    座標 \(X_i\) の代わりに運動量 \(P_i\) を主役にしたいので、ルジャンドル変換 \(W'' = \sum_i P_i X_i + W\) の両辺を全微分します。積の微分公式を使うと、</p>
+    $$ dW'' = d\left(\sum_i P_i X_i\right) + dW $$
+    $$ dW'' = \left(\sum_i X_i dP_i + \sum_i P_i dX_i\right) + \left(\sum_i p_i dx_i - \sum_i P_i dX_i - (H-H')dt\right) $$
+    <p>ここで、\(+\sum_i P_i dX_i\) と \(-\sum_i P_i dX_i\) がぴったり引き算で相殺されて消えます！ 結果として、次のような全微分式が得られます。（これを式Aとします）</p>
+    $$ \text{式A：}\quad dW'' = \sum_i X_i dP_i + \sum_i p_i dx_i - (H-H')dt $$>
+
+    <p><strong>STEP3：数学的な全微分と「係数比較」する</strong><br>
+    一方で、\(W''\) が \((x,P,t)\) を独立変数とする多変数関数であることから、数学の公式通りに全微分を書きます。（これを式Bとします）</p>
+    $$ \text{式B：}\quad dW'' = \sum_i \frac{\partial W''}{\partial P_i}dP_i + \sum_i \frac{\partial W''}{\partial x_i}dx_i + \frac{\partial W''}{\partial t}dt $$
+    <p>まったく同じ \(dW''\) を表している式Aと式Bの微小量（\(dP_i, dx_i, dt\)）の前についている係数を見比べると、自動的に結論が得られます。</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="chapter" id="ch9">
+  <h2>問6</h2>
+
+  <div class="card">
+    <h3>2. なぜ W'' = ΣP_i x_i が恒等変換になるのか？</h3>
+    <div class="note">
+      ⚠ 画像の数式の補足：問題文の枠内に \(W''=\sum P_i X_i\) と書かれていますが、解説欄の「\(x\) を含まない」や問05の背景からも分かる通り、これは \(W''=\sum_i P_i x_i\)（古い座標 \(x\) と新しい運動量 \(P\) の掛け算の和）を意図しています。
+    </div>
+    <p>問05で導いた \(W''\) 型母関数の公式に、そのまま \(W''=\sum_i P_i x_i\) を代入して偏微分してみます。</p>
+
+    <p><strong>① 新しい座標 \(X_i\) を求める公式に代入</strong></p>
+    $$ X_i = \frac{\partial W''}{\partial P_i} = \frac{\partial}{\partial P_i}\left(\sum_j P_j x_j\right) $$
+    <p>これを \(P_i\) で偏微分すると、\(P_i\) にくっついている \(x_i\) だけが残ります。</p>
+    $$ \implies X_i = x_i $$
+
+    <p><strong>② 古い運動量 \(p_i\) を求める公式に代入</strong></p>
+    $$ p_i = \frac{\partial W''}{\partial x_i} = \frac{\partial}{\partial x_i}\left(\sum_j P_j x_j\right) $$
+    <p>これを \(x_i\) で偏微分すると、\(x_i\) にくっついている \(P_i\) だけが残ります。</p>
+    $$ \implies p_i = P_i $$
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="chapter" id="ch10">
+  <h2>7問目</h2>
+
+  <div class="card">
+    <h3>1. この問題でやりたいこと（問題のねらい）</h3>
+    <p>今回は、基本型 \(W(x,X,t)\) から「古い座標 \(x\)」と「新しい座標 \(X\)」の両方をいっぺんに追い出し、独立変数を「古い運動量 \(p\)」と「新しい運動量 \(P\)」のコンビに総入れ替えしたいと考えます。</p>
+    <p>そのために、以下の2つのルジャンドル変換を同時にドッキングさせます。</p>
+    <ul>
+      <li>\(x\) を消して \(p\) に変えるため：\(-\sum_i p_i x_i\) を足す</li>
+      <li>\(X\) を消して \(P\) に変えるため：\(+\sum_i P_i X_i\) を足す</li>
+    </ul>
+    <p>これらを合体させたのが、問題文にある定義式です。</p>
+    $$ W''' = W - \sum_i p_i x_i + \sum_i P_i X_i $$
+  </div>
+
+  <div class="card">
+    <h3>2. 全微分と『ダブル打ち消し合い』</h3>
+    <p>この \(W'''\) を全微分してみると、綺麗な「ダブル相殺」が起きます。</p>
+    <p><strong>基本型 dW：</strong></p>
+    $$ dW = \sum_i p_i dx_i - \sum_i P_i dX_i - (H-H')dt $$
+    <p><strong>\(-\sum p_i x_i\) の微分：</strong></p>
+    $$ d\left(-\sum_i p_i x_i\right) = -\sum_i x_i dp_i - \sum_i p_i dx_i $$
+    <p><strong>\(+\sum P_i X_i\) の微分：</strong></p>
+    $$ d\left(\sum_i P_i X_i\right) = \sum_i X_i dP_i + \sum_i P_i dX_i $$
+    <p>これら3つを全部足し合わせると……</p>
+    <ul>
+      <li>\(p_i dx_i\) の項：プラスマイナスで相殺して消滅！</li>
+      <li>\(P_i dX_i\) の項：マイナスプラスで相殺して消滅！</li>
+    </ul>
+    <p>どちらの座標の微小変化（\(dx_i, dX_i\)）も消え去り、運動量の微小変化（\(dp_i, dP_i\)）だけが残った次の式が得られます。</p>
+    $$ dW''' = -\sum_i x_i dp_i + \sum_i X_i dP_i - (H-H')dt $$
+  </div>
+
+  <div class="card">
+    <h3>3. 最後のお約束：『係数比較』</h3>
+    <p>残った全微分式と、多変数関数 \(W'''(p,P,t)\) の数学的な全微分式を並べて見比べます。</p>
+    <p><strong>式A（計算で求めた全微分）：</strong></p>
+    $$ dW''' = \sum_i(-x_i)dp_i + \sum_i X_i dP_i - (H-H')dt $$
+    <p><strong>式B（数学的な全微分）：</strong></p>
+    $$ dW''' = \sum_i \frac{\partial W'''}{\partial p_i}dp_i + \sum_i \frac{\partial W'''}{\partial P_i}dP_i + \frac{\partial W'''}{\partial t}dt $$
+    <p>それぞれの微小量（\(dp_i, dP_i\)）の前にある係数を比較すると、</p>
+    <ul>
+      <li>\(dp_i\) の係数：\(-x_i = \dfrac{\partial W'''}{\partial p_i} \implies x_i = -\dfrac{\partial W'''}{\partial p_i}\)（※マイナスが付く点に注意！）</li>
+      <li>\(dP_i\) の係数：\(X_i = \dfrac{\partial W'''}{\partial P_i}\)</li>
+    </ul>
+    <p>という、\(W'''\) 型母関数が持つべき関係式が見ごとに導き出せました。</p>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="chapter" id="ch11">
+  <h2>8問目 例題3-1 もっと楽に</h2>
+
+  <div class="card">
+    <h3>1. 速度成分の計算</h3>
+    <p>位置関係 \(x=r\cos\phi, y=r\sin\phi\) を時間 \(t\) で微分します（積の微分法を用います）。</p>
+    $$ \dot{x} = \dot{r}\cos\phi - r\dot{\phi}\sin\phi $$
+    $$ \dot{y} = \dot{r}\sin\phi + r\dot{\phi}\cos\phi $$
+    <p>これらをそれぞれ2乗して足すと、三角関数の相互関係（\(\cos^2\phi+\sin^2\phi=1\)）によりクロス項が相殺され、次の速度の2乗が得られます。</p>
+    $$ \dot{x}^2+\dot{y}^2 = \dot{r}^2 + r^2\dot{\phi}^2 $$
+  </div>
+
+  <div class="card">
+    <h3>2. 運動エネルギーの代入</h3>
+    <p>ニュートン力学における運動エネルギーの式 \(T=\frac{1}{2}m(\dot{x}^2+\dot{y}^2)\) に代入すると、</p>
+    $$ T = \frac{1}{2}m\left(\dot{r}^2+r^2\dot{\phi}^2\right) $$
+    <p>となります。</p>
+  </div>
+
+  <div class="card">
+    <h3>3. 正準運動量への変換</h3>
+    <p>極座標での正準運動量の定義（または質量と速度の関係）は以下の通りです。</p>
+    <ul>
+      <li>径方向の運動量：\(p_r = m\dot{r} \implies \dot{r} = \dfrac{p_r}{m}\)</li>
+      <li>角運動量：\(p_\phi = mr^2\dot{\phi} \implies \dot{\phi} = \dfrac{p_\phi}{mr^2}\)</li>
+    </ul>
+    <p>これらを運動エネルギーの式に代入すると：</p>
+    $$ T = \frac{1}{2}m\left[\left(\frac{p_r}{m}\right)^2 + r^2\left(\frac{p_\phi}{mr^2}\right)^2\right] $$
+    $$ T = \frac{1}{2}m\left(\frac{p_r^2}{m^2} + \frac{p_\phi^2}{m^2 r^2}\right) $$
+    $$ T = \frac{1}{2m}\left(p_r^2 + \frac{1}{r^2}p_\phi^2\right) $$
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="chapter" id="ch12">
+  <h2>母関数の使い方</h2>
+
+  <div class="card">
+    <h3>1. 母関数を使う目的（何のために使う？）</h3>
+    <p>解析力学で母関数を使う目的は主に2つあります。</p>
+    <ol>
+      <li>与えられた変換が「正準変換」になっているか判定・証明する（例題3.2など）</li>
+      <li>計算がラクになる新しい座標系へ変換する式を作る（極座標への変換など）</li>
+    </ol>
+    <p>ハミルトン形式では「運動方程式の形を崩さない変換（正準変換）」しか使えません。母関数という関数を介して変換式を作れば、「確実に正準変換になることが保証される」という利点があります。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. 母関数の基本的な使い方（3ステップ）</h3>
+    <p>母関数には変数の組み合わせによって \(W(x,X), W'(p,X), W''(x,P), W'''(p,P)\) の4つのタイプがありますが、使い方の流れはすべて同じです。ここでは一番よく使われる \(W'(p,X)\) 型（旧運動量 \(p\) と新座標 \(X\) を変数とするタイプ）を例に解説します。</p>
+    <p><strong>ステップ①：公式（関係式）を用意する</strong><br>
+    \(W'\) 型の母関数を使う場合、対応する偏微分の公式は決まっています。</p>
+    <ul>
+      <li>旧座標：\(x = -\dfrac{\partial W'}{\partial p}\)</li>
+      <li>新運動量：\(P = -\dfrac{\partial W'}{\partial X}\)</li>
+    </ul>
+    <p><strong>ステップ②：母関数 \(W'\) を変数で偏微分する</strong><br>
+    問題で与えられた（あるいは自分で作った）\(W'\) を、実際に \(p\) や \(X\) で偏微分します。</p>
+    <p><strong>ステップ③：関係式を解いて、変換式 \((x,p) \leftrightarrow (X,P)\) を導く</strong><br>
+    偏微分して得られた2つの式を整理して、「旧変数」と「新変数」の関係を露わにします。</p>
+  </div>
+
+  <div class="card">
+    <h3>3. 具体例で使い方の流れを掴む</h3>
+    <p>先ほどの例題3.2（\(X=p, P=-x\) の証明）で使われた母関数 \(W'''(p,P)=pP\) で流れを追ってみましょう。</p>
+    <ol>
+      <li>公式の準備：\(W'''(p,P)\) 型の公式は \(x=-\dfrac{\partial W'''}{\partial p}, X=\dfrac{\partial W'''}{\partial P}\) です。</li>
+      <li>偏微分を実行：\(p\) で偏微分 \(\to \dfrac{\partial W'''}{\partial p}=P\)　\(P\) で偏微分 \(\to \dfrac{\partial W'''}{\partial P}=p\)</li>
+      <li>公式に代入して整理：\(x=-P \implies P=-x\)　\(X=p\)</li>
+    </ol>
+    <p>このように、「母関数をただ偏微分するだけ」で、元の変数と新しい変数の対応関係（\(X=p, P=-x\)）が自動的に引っ張り出されてきます。</p>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="chapter" id="ch13">
+  <h2>例題3.2</h2>
+
+  <div class="card">
+    <h3>アプローチ①：母関数 W'''(p,P) を使う方法（前半）</h3>
+    <p>「旧運動量 \(p\)」と「新運動量 \(P\)」を独立変数とする第3種（または第4種）の母関数 \(W'''(p,P,t)=pP\) を用意します。</p>
+    <p>この母関数に対する正準変換の公式：</p>
+    <ul>
+      <li>\(X = \dfrac{\partial W'''}{\partial P} = \dfrac{\partial}{\partial P}(pP) = p\)</li>
+      <li>\(x = -\dfrac{\partial W'''}{\partial p} = -\dfrac{\partial}{\partial p}(pP) = -P \implies P = -x\)</li>
+    </ul>
+    <p>計算すると見事に \((X,P)=(p,-x)\) が導かれます。「適切な母関数が存在する＝正準変換である」という正準変換の定義を満たしていることが確認できます。</p>
+  </div>
+
+  <div class="card">
+    <h3>アプローチ②：正準方程式が維持されるかを直接確かめる方法（後半）</h3>
+    <p>変換後の変数 \((X,P)\) においても、元のハミルトンの運動方程式と同じ形（\(\dot{X}=\partial H'/\partial P, \dot{P}=-\partial H'/\partial X\)）が成り立つかを直接確認します。</p>
+    <ol>
+      <li>時間微分の計算：\(\dot{X}=\dot{p}=-\dfrac{\partial H}{\partial x}\)　\(\dot{P}=-\dot{x}=-\dfrac{\partial H}{\partial p}\)</li>
+      <li>ハミルトニアンの偏微分の計算（連鎖律）：
+        $$ \frac{\partial H'}{\partial P} = \frac{\partial H}{\partial x}\cdot\frac{\partial x}{\partial P} = \frac{\partial H}{\partial x}\cdot(-1) = -\frac{\partial H}{\partial x} $$
+        $$ \frac{\partial H'}{\partial X} = \frac{\partial H}{\partial p}\cdot\frac{\partial p}{\partial X} = \frac{\partial H}{\partial p}\cdot 1 = \frac{\partial H}{\partial p} $$
+      </li>
+      <li>比較する：\(\dot{X}=-\dfrac{\partial H}{\partial x}=\dfrac{\partial H'}{\partial P}\)　\(\dot{P}=-\dfrac{\partial H}{\partial p}=-\dfrac{\partial H'}{\partial X}\)</li>
+    </ol>
+    <p>新しい変数 \((X,P)\) でも全く同じハミルトン方程式の形が成立するため、正準変換であることが確かに確かめられました。</p>
+  </div>
+
+  <div class="card">
+    <h3>補足：ポアソン括弧で考えると一瞬です</h3>
+    <p>ちなみに、ポアソン括弧の定義を知っている場合、正準変換の必要十分条件である \(\{X,P\}_{x,p}=1\) を計算するのが最も早いです。</p>
+    $$ \{X,P\}_{x,p} = \frac{\partial X}{\partial x}\frac{\partial P}{\partial p} - \frac{\partial X}{\partial p}\frac{\partial P}{\partial x} $$
+    <p>\(X=p, P=-x\) を代入すると：</p>
+    <ul>
+      <li>\(\dfrac{\partial X}{\partial x}=0, \quad \dfrac{\partial P}{\partial p}=0\)</li>
+      <li>\(\dfrac{\partial X}{\partial p}=1, \quad \dfrac{\partial P}{\partial x}=-1\)</li>
+    </ul>
+    $$ \{X,P\}_{x,p} = (0\cdot 0) - (1\cdot(-1)) = 1 $$
+    <p>ポアソン括弧が1になるため、一発で正準変換であることが分かります。</p>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="chapter" id="ch14">
+  <h2>微小正準変換の考え方</h2>
+
+  <div class="card">
+    <h3>1. 全体のストーリー（何をしたいのか？）</h3>
+    <p>このページの目的は、「物理法則の対称性（ズレにくさ）があると、必ず何かが保存する」というネーターの定理を解析力学（ハミルトン力学）の言葉で理解することです。</p>
+    <ul>
+      <li>空間を少し回転させても物理法則が変わらない → 角運動量が保存する</li>
+      <li>空間を少し平行移動させても変わらない → 運動量が保存する</li>
+      <li>時間を少し進めても変わらない → エネルギーが保存する</li>
+    </ul>
+    <p>この「少し動かす」操作を数式で表すツールが微小正準変換です。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. 各数式・概念の解説</h3>
+    <p><strong>① 恒等変換＋ちょい足し（微小正準変換）</strong></p>
+    $$ W''''(x,p) = \sum_i p_i x_i + \varepsilon S(x,p) $$
+    <ul>
+      <li>\(\sum_i p_i x_i\)（第1項）：何もしない変換（恒等変換）を表す母関数です。新座標 \(X\) も新運動量 \(P\) も元の \(x,p\) と全く同じになります。</li>
+      <li>\(\varepsilon S(x,p)\)（第2項）：ここにごく小さなパラメータ \(\varepsilon\)（例えば0.0001みたいな微小量）と関数 \(S\) を付け足します。</li>
+      <li>これにより、「ほんの少しだけ座標や運動量をずらす変換」が作れます。</li>
+    </ul>
+
+    <p><strong>② ずれる量の計算（生成子の役割）</strong></p>
+    <p>母関数の微分公式を計算して、微小変化量 \(\delta x_i = X_i - x_i\) や \(\delta p_i = P_i - p_i\) を求めると、次の関係式が得られます。</p>
+    $$ \delta x_i = \varepsilon\frac{\partial S}{\partial p_i}, \quad \delta p_i = -\varepsilon\frac{\partial S}{\partial x_i} $$
+    <p>ここで登場する関数 \(S\) を「変換の生成子（generator）」と呼びます。つまり、\(S\) という関数をひとつ決めてあげれば、「座標や運動量が具体的にどうずれるか」が自動的に決まる仕組みになっています。</p>
+
+    <p><strong>③ 具体例：なぜ角運動量なのか？</strong></p>
+    <p>具体的に \(S\) として角運動量 \(L_z = xp_y - yp_x\)（にマイナス等を考慮した形）を選ぶ例が挙げられています。</p>
+    <p>この \(S\) を上の微分公式に入れて計算すると、\(\delta x\) や \(\delta y\) はちょうど「z軸まわりに微小角度 \(\varepsilon\) だけ回転させたときの座標のズレ」と完全に一致します。</p>
+    <div class="highlight"><p>「角運動量 \(S\) を生成子に使う」⇔「回転という変化（変換）が作られる」という美しい対応関係が成り立っているのです。</p></div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="chapter" id="ch15">
+  <h2>問題15 回転の生成子 補足</h2>
+
+  <div class="card">
+    <h3>1. 変化後の座標 (x', y') を用意する</h3>
+    <p>まず、変形後の座標を \(x', y'\) と置きます（元の画像で言う「新しい変数」のことです）。ズレの定義は \(\delta x = x'-x\) なので、移項すると次のように書けます。</p>
+    $$ x' = x + \delta x $$
+    $$ y' = y + \delta y $$
+    <p>ここに、直前で求めた \(\delta x = \varepsilon y\) と \(\delta y = -\varepsilon x\) を代入します。</p>
+    $$ x' = x + \varepsilon y = 1\cdot x + \varepsilon\cdot y $$
+    $$ y' = y - \varepsilon x = (-\varepsilon)\cdot x + 1\cdot y $$
+  </div>
+
+  <div class="card">
+    <h3>2. 行列の形にまとめる</h3>
+    <p>上の \(x'\) と \(y'\) の式を、行列とベクトルの積の形にまとめると次の行列になります。</p>
+    $$ \begin{pmatrix}x'\\y'\end{pmatrix} = \begin{pmatrix}1 & \varepsilon\\ -\varepsilon & 1\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} $$
+    <p>これで、「\(\varepsilon S\) という微小変化によって、元の座標 \((x,y)\) がどう変換されるか」が行列で表せました。</p>
+  </div>
+
+  <div class="card">
+    <h3>3. なぜ回転行列（≈）になるのか？</h3>
+    <p>ここが一番のポイントです。角度 \(\varepsilon\) がごく小さいとき（\(\varepsilon \ll 1\)）、三角関数の1次近似（テイラー展開の最初の手前）は次のようになります。</p>
+    <ul>
+      <li>\(\cos\varepsilon \approx 1\)</li>
+      <li>\(\sin\varepsilon \approx \varepsilon\)</li>
+    </ul>
+    <p>これを一般的な2次元の回転行列に当てはめてみます。通常、角度 \(\theta\) の回転行列は以下の通りです。</p>
+    $$ \begin{pmatrix}\cos\theta & \sin\theta\\ -\sin\theta & \cos\theta\end{pmatrix} $$
+    <p>ここで \(\theta=\varepsilon\) として上記の近似（\(\cos\varepsilon\approx1, \sin\varepsilon\approx\varepsilon\)）を使うと、</p>
+    $$ \begin{pmatrix}\cos\varepsilon & \sin\varepsilon\\ -\sin\varepsilon & \cos\varepsilon\end{pmatrix} \approx \begin{pmatrix}1 & \varepsilon\\ -\varepsilon & 1\end{pmatrix} $$
+    <p>となります。</p>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="chapter" id="ch16">
+  <h2>問16 ネーターの定理① 補足</h2>
+
+  <div class="card">
+    <p>この解説画像の一連の計算は、ネーターの定理（対称性と保存則を結びつける基本原理）を自力で証明・導出している計算です。</p>
+    <p>一言で言うと、「時間や座標をほんの少しずらしても物理法則（作用 \(I\)）が変わらないなら、時間の経過に依存しない一定の量 \(N\)（保存量）が必ず存在する」ということを数学的に証明しています。</p>
+  </div>
+
+  <div class="card">
+    <h3>1. 問いの設定：何を証明したいのか？</h3>
+    <p><strong>微小変換</strong>：時間 \(t\) や座標 \(x\) を少しだけずらします。</p>
+    $$ t' = t + \varepsilon w(x,t) $$
+    $$ x' = x + \varepsilon u(x,t) $$
+    <ul>
+      <li><strong>条件</strong>：この変換をしても、作用積分が不変（\(I'=I\)、つまり \(I'-I=0\)）であると仮定します。</li>
+      <li><strong>ゴール</strong>：この条件から、ある物理量 \(N\) が定数（保存量）になることを示します。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>2. 証明の流れ（各ステップのポイント）</h3>
+    <p>長い変形が行われていますが、やっている操作は非常にシンプルです。</p>
+    <p><strong>① 微小変化した作用 I' を元の変数 t で書き直す（Step 1〜4）</strong><br>
+    変換後の作用 \(I'\) は \(t'\) や \(x'\) で書かれています。これをテイラー展開（\(\varepsilon\) の1次の項まで近似）を使って、すべて元の変数 \(t\) や \(x\) の式に無理やり戻します。その結果、\(I'-I\)（変換による作用の変化量）を計算できるようになります。</p>
+    <p><strong>② 被積分関数を「1つの時間微分 \(\frac{d}{dt}[\dots]\)」の形にまとめる（Step 5〜7）</strong><br>
+    ここが計算技術上の最大のハイライトです。バラバラに出てきた項を、オイラー・ラグランジュ方程式やハミルトニアンの定義、積の微分公式などをうまく活用して整理します。すると、被積分関数の全体が綺麗な「何かの時間微分」の形にまとまります。</p>
+    $$ \text{被積分関数} = \frac{d}{dt}\left[u\frac{\partial L}{\partial \dot{x}} - wH\right] $$
+    <p><strong>③ 積分を実行して端点（境界）の値だけにする（Step 8）</strong><br>
+    微分したものを時間積分するので、「微積分学の基本定理」（\(\int_{t_0}^{t_1}\frac{d}{dt}[F(t)]dt = F(t_1)-F(t_0)\)）により、積分記号が外れて最初と最後の時刻 \(t_0, t_1\) の代入差だけになります。</p>
+    $$ I'-I = \left[\varepsilon\left(\frac{\partial L}{\partial \dot{x}}u - wH\right)\right]_{t_0}^{t_1} = N(t_1) - N(t_0) $$
+  </div>
+
+  <div class="card">
+    <h3>3. 結論：なぜ N が保存量と言えるのか？</h3>
+    <p>仮定より作用は不変（\(I'-I=0\)）なので、任意の時刻 \(t_0, t_1\) について常に以下が成り立ちます。</p>
+    $$ N(t_1) - N(t_0) = 0 \implies N(t_1) = N(t_0) $$
+    <p>どの時刻 \(t_0, t_1\) を持ってきても \(N\) の値が変わらないということは、「\(N\) は運動のあいだずっと一定値を保つ（＝保存量である）」ということが示せた、というロジックです。</p>
+    <p><strong>具体的に N は何を表すの？</strong><br>
+    変換のさせ方（\(u\) や \(w\) の選び方）によって、この \(N\) はおなじみの保存量になります。</p>
+    <ul>
+      <li>空間の平行移動（\(w=0, u=1\)）：\(N \propto \dfrac{\partial L}{\partial \dot{x}} = p\)（運動量保存則）</li>
+      <li>時間の平行移動（\(w=1, u=0\)）：\(N \propto -H\)（エネルギー保存則）</li>
+    </ul>
+    <p>この統一的な関係を導き出しているのが、この問題の証明です！</p>
+  </div>
+</section>
+
+<!-- 17 -->
+<section class="chapter" id="ch17">
+  <h2>ネーターの定理① ポアソン括弧版</h2>
+
+  <div class="note">ポアソン括弧で解いたほうが、計算量が少なく楽になるけれど、解き方を指定されたら使えないから何とも言えない</div>
+
+  <div class="card">
+    <h3>ハミルトン形式による超スマートな導出</h3>
+    <p><strong>1. 微小正準変換の母関数をセットする</strong><br>
+    問題文にあるズレ（微小変換）を生み出す母関数 \(W\) を考えます。恒等変換に、微小パラメータ \(\varepsilon\) と生成子 \(N(x,p,t)\) を付け足した形にします。</p>
+    $$ W(x,P,t) = xP + \varepsilon N(x,P,t) $$
+
+    <p><strong>2. 変化したハミルトニアン H' を求める</strong><br>
+    時間が変化する（あるいは母関数が陽に時間 \(t\) に依存する）正準変換では、新しいハミルトニアン \(H'\) は次のように書けます。</p>
+    $$ H' = H + \frac{\partial W}{\partial t} = H + \varepsilon\frac{\partial N}{\partial t} $$
+
+    <p><strong>3. 「物理法則が不変（対称性がある）」を式にする</strong><br>
+    ハミルトニアンの形自体がこの変換で変わらない（＝対称性がある）ということは、\(H'\) と \(H\) の差が微小変換によって生じるハミルトニアン自身の変化分と一致するということです。</p>
+    <p>ハミルトニアンの微小変化 \(\delta H = H'-H\) は、ポアソン括弧 \(\{H,N\}\) を使って次のように表されます。</p>
+    $$ \delta H = \varepsilon\{H,N\} + \varepsilon\frac{\partial N}{\partial t} $$
+    <p>対称性より、このシステムで \(N\) が変換の生成子として法則を不変に保つとき、全時間微分は次のようになります。</p>
+    $$ \frac{dN}{dt} = \frac{\partial N}{\partial t} + \{N,H\} = 0 $$
+    <p>この \(\frac{dN}{dt}=0\) という式こそが、「\(N\) は時間的に変化しない＝保存量である」という結論そのものです！</p>
+  </div>
+
+  <div class="card">
+    <h3>なぜラグランジュ形式の解説はあんなに長かったのか？</h3>
+    <p>教科書や問題集であえて長い計算をさせている理由は次の2点です。</p>
+    <ol>
+      <li>ラグランジアン \(L(x,\dot{x},t)\) の世界で解こうとしたから：ラグランジアンは「座標 \(x\) と速度 \(\dot{x}\)」を扱うため、時間 \(t\) をずらすと速度 \(\dot{x}=dx/dt\) の分母・分子の両方が同時にズレてしまい、テイラー展開の計算が爆発します。</li>
+      <li>「作用積分 \(I\) の不変性」から出発する最も原始的・根本的な証明を見せるため：ネーターの定理の歴史的・構造的な原点をステップ・バイ・ステップで再現させているため、あのように長い証明になっています。</li>
+    </ol>
+    <p>「ネーターの定理のイメージや計算の流れを追う」という目的であれば、最初の解説にあった長い展開を一通り理解しておけば十分ですが、「実際に保存量をサクッと探したい・証明したい」というときは、この生成子 \(N\) とポアソン括弧（正準変換）の関係を使うほうが圧倒的に楽になります！</p>
+  </div>
+
+  <div class="card">
+    <h3>1. ポアソン括弧の定義（復習）</h3>
+    <p>まず、2つの物理量 \(A(x,p)\) と \(B(x,p)\) のポアソン括弧 \(\{A,B\}\) は次のように定義されます。</p>
+    $$ \{A,B\} = \frac{\partial A}{\partial x}\frac{\partial B}{\partial p} - \frac{\partial A}{\partial p}\frac{\partial B}{\partial x} $$
+  </div>
+
+  <div class="card">
+    <h3>2. 【超重要】微小正準変換による「量の変化」の基本公式</h3>
+    <p>生成子 \(N\) による微小正準変換では、座標 \(x\) と運動量 \(p\) の変化量（ズレ）は次のようになります（1つ目の画像に出てきた式です）。</p>
+    $$ \delta x = \varepsilon\frac{\partial N}{\partial p} $$
+    $$ \delta p = -\varepsilon\frac{\partial N}{\partial x} $$
+    <p>このとき、\(x\) や \(p\) の関数である任意の物理量 \(F(x,p,t)\) が、この変換によってどれくらい変化（\(\delta F\)）するかをテイラー展開で1次まで計算してみます。</p>
+    $$ \delta F = F(x+\delta x, p+\delta p, t) - F(x,p,t) \approx \frac{\partial F}{\partial x}\delta x + \frac{\partial F}{\partial p}\delta p $$
+    <p>ここに上の \(\delta x\) と \(\delta p\) を代入すると、</p>
+    $$ \delta F = \frac{\partial F}{\partial x}\left(\varepsilon\frac{\partial N}{\partial p}\right) + \frac{\partial F}{\partial p}\left(-\varepsilon\frac{\partial N}{\partial x}\right) $$
+    $$ \delta F = \varepsilon\left(\frac{\partial F}{\partial x}\frac{\partial N}{\partial p} - \frac{\partial F}{\partial p}\frac{\partial N}{\partial x}\right) $$
+    <p>括弧の中身をよく見ると、まさにポアソン括弧の定義そのものになっています！</p>
+    $$ \delta F = \varepsilon\{F,N\} $$
+    <div class="highlight"><p><strong>【ここまでの結論】</strong><br>「生成子 \(N\) で微小変換したときの物理量 \(F\) の変化量」は、必ず \(\varepsilon\{F,N\}\) になる。</p></div>
+  </div>
+
+  <div class="card">
+    <h3>3. なぜ δH = ε{H,N} + ε∂N/∂t になるのか？</h3>
+    <p>では、物理量 \(F\) としてハミルトニアン \(H\) をあてはめてみましょう。ハミルトニアンの変換には、一般の物理量の変化に加えて「母関数が時間依存することによる補正」が入ります。</p>
+    <p><strong>① 正準変換における新しいハミルトニアン H'</strong><br>
+    母関数 \(W(x,P,t)=xP+\varepsilon N(x,P,t)\) を使った時間依存する正準変換では、新しいハミルトニアン \(H'\) は次のように書けます。</p>
+    $$ H' = H + \frac{\partial W}{\partial t} $$
+    <p>ここで \(\dfrac{\partial W}{\partial t}=\varepsilon\dfrac{\partial N}{\partial t}\) ですから、</p>
+    $$ H' = H + \varepsilon\frac{\partial N}{\partial t} $$
+    <p><strong>② ハミルトニアン自身の引数のズレによる変化</strong><br>
+    さらに、もともとの \(H(x,p)\) の中身（\(x\) と \(p\)）自体も微小変換によってずれています。この「\(x,p\) のズレによる \(H\) 自身の変化量」が、先ほど計算した「基本公式 \(\delta H_\text{座標} = \varepsilon\{H,N\}\)」です。</p>
+    <p><strong>③ 2つを合わせる</strong><br>
+    したがって、変換後の新しいハミルトニアン \(H'\) と元のハミルトニアン \(H\) の全変化量 \(\delta H\) は、</p>
+    $$ \delta H = (\text{座標・運動量のズレによる変化}) + (\text{母時間の微分による補正}) $$
+    $$ \delta H = \varepsilon\{H,N\} + \varepsilon\frac{\partial N}{\partial t} $$
+    <p>となります！</p>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="chapter" id="ch18">
+  <h2>ハミルトンヤコビ方程式</h2>
+
+  <div class="card">
+    <h3>① ハミルトン・ヤコビ方程式の位置づけ</h3>
+    <ul>
+      <li><strong>目的</strong>：物体の運動を計算するのは大変なので、座標や運動量を別の変数に変換（正準変換）して計算をラクにしたい。</li>
+      <li><strong>アイデア</strong>：「いっそのこと、新しいハミルトニアン \(H'\)（エネルギーみたいなもの）を完全な『0』にしてしまおう！」という極端なアイデアです。</li>
+      <li><strong>導出</strong>：変換のための関数 \(W''(x,\alpha,t)\)（他の本では \(S\) と書く「ハミルトンの主関数」）を使うと、条件 \(H'=0\) は以下の偏微分方程式になります。</li>
+    </ul>
+    $$ \frac{\partial W''}{\partial t} + H\left(x, \frac{\partial W''}{\partial x}, t\right) = 0 $$
+    <div class="note">ポイント：元の運動量 \(p\) を \(p=\dfrac{\partial W''}{\partial x}\) で置き換えているのが特徴です。</div>
+  </div>
+
+  <div class="card">
+    <h3>② なぜ H' = 0 だと嬉しいのか？（ココが一番重要！）</h3>
+    <ul>
+      <li><strong>理由</strong>：ハミルトンの運動方程式は \(\dot{X}=\partial H'/\partial P\) や \(\dot{P}=-\partial H'/\partial X\) なので、\(H'=0\) なら時間の変化率がどちらも0（\(\dot{X}=0, \dot{P}=0\)）になります。</li>
+      <li><strong>意味</strong>：新しい座標系から見ると、「粒子が止まっている（定数になっている）」状態になります。</li>
+      <li><strong>解き方</strong>：止まっている世界（定数 \(\alpha,\beta\)）で計算したあと、逆算（\(X=\beta=\partial W''/\partial\alpha\)）して現実の物体の動き \(x(t)\) を導き出すという手順を踏みます。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>2枚目：作用変数・角変数、断熱不変量</h3>
+    <p>ここでは周期的な運動（振り子や惑星の公転など）を扱うための便利なツールについて書かれています。</p>
+    <p><strong>① 作用変数 J と角変数 ω</strong></p>
+    <ul>
+      <li>作用変数 \(J\)：1周期の間に相空間（位置と運動量のグラフ）で軌道が囲む「面積」を表します（\(J=\oint p\,dx\)）。</li>
+      <li>角変数 \(\omega\)：周期運動の「時計の針」のようなものです。
+        <ul>
+          <li>\(H\) が \(J\) だけの関数になると、針の進むスピードは一定（\(\dot{\omega}=\partial H/\partial J=\)一定）になります。</li>
+          <li>ちょうど1周期（時間 \(T\)）経つと、\(\omega\) は \(2\pi\)（1周）変化します。</li>
+        </ul>
+      </li>
+    </ul>
+    <p><strong>② 断熱不変量（だんねつふへんりょう）</strong></p>
+    <ul>
+      <li><strong>意味</strong>：システムの条件（例：箱の壁を動かす、ブランコの紐の長さを変えるなど）を「めちゃくちゃゆっくり」変化させるとき、作用変数 \(J\)（囲む面積）はほとんど変化しないという性質のことです。</li>
+      <li><strong>歴史的背景</strong>：この「ゆっくり変えても崩れない量（\(J\)）」という考え方は、前期量子論（ボーア・ゾンマーフェルトの量子化条件）で、電子の軌道を量子化（とびとびの値に）する際の重要な手がかりとなりました。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="chapter" id="ch19">
+  <h2>問19 演習問題1</h2>
+
+  <div class="card">
+    <h3>1. 積分形のセットアップ</h3>
+    <p>与えられた微分方程式は以下の通りです。</p>
+    $$ dt = \sqrt{\frac{m}{2}}\frac{dx}{\sqrt{E-\frac{1}{2}kx^2}} $$
+    <p>両辺を積分する形に整えます。</p>
+    $$ t = \sqrt{\frac{m}{2}}\int \frac{1}{\sqrt{E-\frac{1}{2}kx^2}}\,dx $$
+  </div>
+
+  <div class="card">
+    <h3>2. 置換積分による計算</h3>
+    <p>ルートの中身を \(1-\sin^2\theta=\cos^2\theta\) の公式で簡略化するため、次のように置換します。</p>
+    $$ x = \sqrt{\frac{2E}{k}}\sin\theta $$
+    <p><strong>① dx の微分関係</strong></p>
+    <p>両辺を \(\theta\) で微分します。</p>
+    $$ \frac{dx}{d\theta} = \sqrt{\frac{2E}{k}}\cos\theta \implies dx = \sqrt{\frac{2E}{k}}\cos\theta\,d\theta $$
+    <p><strong>② 分母（根号部分）の変形</strong></p>
+    <p>\(x\) を代入して整理します。</p>
+    $$ \sqrt{E-\frac{1}{2}kx^2} = \sqrt{E-\frac{1}{2}k\left(\sqrt{\frac{2E}{k}}\sin\theta\right)^2} = \sqrt{E-E\sin^2\theta} = \sqrt{E}\cos\theta $$
+  </div>
+
+  <div class="card">
+    <h3>3. 被積分関数への代入と求積</h3>
+    <p>これらを積分の式に代入します。</p>
+    $$ \int\frac{1}{\sqrt{E-\frac{1}{2}kx^2}}dx = \int\frac{1}{\sqrt{E}\cos\theta}\cdot\left(\sqrt{\frac{2E}{k}}\cos\theta\right)d\theta $$
+    <p>分子・分母の \(\cos\theta\) と \(\sqrt{E}\) が約分されて消えます。</p>
+    $$ = \int\sqrt{\frac{2}{k}}\,d\theta = \sqrt{\frac{2}{k}}\theta $$
+  </div>
+
+  <div class="card">
+    <h3>4. t の式（逆三角関数）の導出</h3>
+    <p>全体に元の係数 \(\sqrt{m/2}\) を掛け、積分定数 \(C\) を加えます。</p>
+    $$ t = \sqrt{\frac{m}{2}}\cdot\sqrt{\frac{2}{k}}\theta + C = \sqrt{\frac{m}{k}}\theta + C $$
+    <p>ここで、\(x=\sqrt{2E/k}\sin\theta\) より、\(\theta = \sin^{-1}\left(\dfrac{x}{\sqrt{2E/k}}\right)\) です。これを代入すると次の式が得られます。</p>
+    $$ t = \sqrt{\frac{m}{k}}\sin^{-1}\left(\frac{x}{\sqrt{2E/k}}\right) + C $$
+  </div>
+
+  <div class="card">
+    <h3>5. x について解く（変形手順）</h3>
+    <p>得られた式を \(x=\) の形へ変形します。</p>
+    <p><strong>定数項の移項と係数の処理</strong></p>
+    $$ t - C = \sqrt{\frac{m}{k}}\sin^{-1}\left(\frac{x}{\sqrt{2E/k}}\right) $$
+    <p>両辺に \(\sqrt{k/m}\) を掛けます。</p>
+    $$ \sqrt{\frac{k}{m}}(t-C) = \sin^{-1}\left(\frac{x}{\sqrt{2E/k}}\right) $$
+    <p><strong>両辺の sin をとる</strong></p>
+    $$ \sin\left(\sqrt{\frac{k}{m}}t - \sqrt{\frac{k}{m}}C\right) = \frac{x}{\sqrt{2E/k}} $$
+    <p><strong>定数の置き換えと x の解定</strong></p>
+    <p>積分定数部分 \(-\sqrt{k/m}\,C\) を新たに \(C'\) と置き直し、両辺に振幅部分を掛けると最終解が得られます。</p>
+    $$ x = \sqrt{\frac{2E}{k}}\sin\left(\sqrt{\frac{k}{m}}t + C'\right) $$
+  </div>
+</section>
+
+<!-- 20 -->
+<section class="chapter" id="ch20">
+  <h2>問20,21 例題4-2 補足</h2>
+
+  <div class="card">
+    <h3>具体的な計算手順</h3>
+    <p><strong>ステップ1：静止した状態での J の計算</strong></p>
+    <ol>
+      <li>運動量 \(p\) を \(E\) で表す：ハミルトニアン \(H=\dfrac{p^2}{2m}=E\) より、\(p=\pm\sqrt{2mE}\) です。
+        <ul>
+          <li>行き（\(-L\to L\)）：\(p=+\sqrt{2mE}\)</li>
+          <li>帰り（\(L\to -L\)）：\(p=-\sqrt{2mE}\)</li>
+        </ul>
+      </li>
+      <li>周回積分を実行する
+        $$ \oint p\,dx = \int_{-L}^{L}\sqrt{2mE}\,dx + \int_{L}^{-L}\left(-\sqrt{2mE}\right)dx $$
+        これを計算して、\(J=4L\sqrt{2mE}\) を導きます。
+      </li>
+    </ol>
+
+    <p><strong>ステップ2：壁を動かしたときの変化量 ΔJ の計算</strong></p>
+    <p>右の壁が左向きに速さ \(v_0\) で移動しているとします。1往復にかかる時間 \(T=\dfrac{2L}{v}\) の間の \(J\) の変化量 \(\Delta J\) を評価します。</p>
+
+    <p><strong>① 長さ変化による寄与 ΔJ₁</strong><br>
+    1往復の間に、右の壁は \(\Delta L=-v_0 T=-\dfrac{2Lv_0}{v}\) だけ縮みます。\(J=4L\sqrt{2mE}=4L(mv)\) より、横幅 \(L\) が変化することによる \(J\) の変化量は：</p>
+    $$ \Delta J_1 = 4(\Delta L)(mv) = 4\left(-\frac{2Lv_0}{v}\right)(mv) = -8Lmv_0 $$
+
+    <p><strong>② 衝突による運動量変化の寄与 ΔJ₂</strong><br>
+    粒子が動く壁と衝突すると、弾性衝突により速度は \(v'=-(v+2v_0)\) になります（大きさは \(2v_0\) 増加）。運動量の増加分は \(\Delta p = m(2v_0)=2mv_0\) です。この運動量増加による \(J\) の変化量は：</p>
+    $$ \Delta J_2 = 4L(\Delta p) = 4L(2mv_0) = +8Lmv_0 $$
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><th>今回の物理問題</th><th>記号</th></tr>
+      <tr><td>衝突前の粒子の速さ</td><td>\(v\)</td></tr>
+      <tr><td>迫ってくる右の壁の速さ</td><td>\(v_0\)</td></tr>
+      <tr><td>衝突後の粒子の速さ</td><td>\(v'=v+2v_0\)</td></tr>
+    </table>
+    <h3>2. 衝突の瞬間に起きていること</h3>
+    <p>右向きに速さ \(v\) で走ってきた粒子が、左向きに速さ \(v_0\) で動いている右の壁にぶつかります。このとき、衝突後の粒子の速さは \(v+2v_0\) になります。</p>
+    <p>なぜ \(2v_0\) だけ速くなるかというと、理由が2つ重なるからです。</p>
+    <ol>
+      <li>ぶつかる衝撃が強くなる（+\(v_0\)）：壁が逃げずに自分に向かって進んでくるため、静止した壁にぶつかる時よりも強い衝撃で弾き返されます。</li>
+      <li>壁に背中を押される（+\(v_0\)）：跳ね返った瞬間、後ろから進んできた壁にそのまま押し出される形になります。</li>
+    </ol>
+    <p>この2つの効果（\(v_0+v_0\)）が合わさるため、粒子は壁の速さの2倍である \(2v_0\) だけ速さを増して左向きに跳ね返されます。</p>
+    <h3>3. これが作用変数 J にどう影響するか？</h3>
+    <p>速さが \(2v_0\) 増えたことで、運動量の大きさ \(p=mv\) は \(2mv_0\) だけ増加します（\(\Delta p=2mv_0\)）。これを問題の証明（ステップ2の②）にあてはめます。</p>
+    <ul>
+      <li>運動量が増えたことによる \(J\) の増加分（\(\Delta J_2\)）：相空間の縦幅（運動量 \(p\)）が押し広げられるため、1往復で \(J\) が増える量は以下のようになります。</li>
+    </ul>
+    $$ \Delta J_2 = 4L\times(\text{運動量の増加分}) = 4L\times(2mv_0) = +8Lmv_0 $$
+  </div>
+
+  <div class="card">
+    <h3>③ 合計の変化量 ΔJ の確認</h3>
+    <p>2つの寄与を足し合わせます。</p>
+    $$ \Delta J = \Delta J_1 + \Delta J_2 = -8Lmv_0 + 8Lmv_0 = 0 \quad \left(O\left(\frac{v_0}{v}\right)\text{の範囲で}\right) $$
+    <p>より詳細に展開しても残るのは \(O((v_0/v)^2)\) の高次項のみとなるため、「\(v_0/v\) の1次のオーダーでは \(\Delta J=0\) であり、\(J\) は断熱不変（一定）である」と結論づければ完了です。</p>
+    <h3>答案に書く際のポイント</h3>
+    <ul>
+      <li>ステップ1：\(\oint\) を「往路」と「復路」の2つの定積分に分け、両者の符号が合わさってプラス（面積）になることを示す。</li>
+      <li>ステップ2：相対速度を使って「衝突後の速度 \(v'\)」を求めた後、微小量 \(v_0/v\) の1次の項に着目して \(\Delta J_1\) と \(\Delta J_2\) が打ち消し合うことを明記する。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 21 -->
+<section class="chapter" id="ch21">
+  <h2>問22 ヤコビアン 補足</h2>
+
+  <div class="card">
+    <h3>1. この問題は何をしようとしているのか？</h3>
+    <p>一見すると「極座標変換 \((x,y)\to(r,\theta)\) のヤコビアンを計算する問題」のように見えますが、実は解析力学（ハミルトン力学）における「相空間の正準変換」についての問題です。</p>
+    <p>通常の2次元空間の座標変換 \((x,y)\to(r,\theta)\) のヤコビアンは \(r\) になり、1にはなりません。しかし、解析力学では「位置 \(x\)」だけでなく「運動量 \(p\)」も合わせた相空間 \((x,p)\to(X,P)\) での変換を考えます。</p>
+    <p>正準変換（ハミルトンの運動方程式の形式を保つ変換）を行うと、相空間の微小面積要素 \(dx\,dp\) は拡大・縮小せず、\(dX\,dP = dx\,dp\) となって保存されます。この「相空間の面積（体積）が保存されること（ヤコビアン \(J=1\)）」を母関数を用いて証明しているのが、掲載されている解説です。</p>
+  </div>
+
+  <div class="card">
+    <h3>2. 解説の展開（証明のステップ）</h3>
+    <p><strong>① ヤコビアンの分解（連鎖律）</strong><br>
+    相空間のヤコビアン \(J=\dfrac{\partial(X,P)}{\partial(x,p)}\) を直接計算するのが大変なため、位置 \(x\) と新しい運動量 \(P\) を仲介役（中間変数）として、分数の計算のように2つに分解します。</p>
+    $$ J = \frac{\partial(X,P)}{\partial(x,p)} = \frac{\dfrac{\partial(X,P)}{\partial(x,P)}}{\dfrac{\partial(x,p)}{\partial(x,P)}} $$
+  </div>
+
+  <div class="card">
+    <h3>② 母関数による偏微分関係式の導出（(★)の式）</h3>
+    <p>型 \(W''(x,P,t)\)（一般的には \(W_2(x,P,t)\) と書かれることが多い母関数）を用いると、正準変換の関係式は次のように書けます。</p>
+    <ul>
+      <li>\(X = \dfrac{\partial W''}{\partial P}\)</li>
+      <li>\(p = \dfrac{\partial W''}{\partial x}\)</li>
+    </ul>
+    <p>ここで、それぞれの式をさらに別の変数で偏微分（2階偏微分）します。</p>
+    $$ \frac{\partial X}{\partial x} = \frac{\partial^2 W''}{\partial x\partial P}, \qquad \frac{\partial p}{\partial P} = \frac{\partial^2 W''}{\partial P\partial x} $$
+    <p>偏微分の順序交換可能性（シュワルツの定理）により、両者は等しくなります。</p>
+    $$ \frac{\partial X}{\partial x} = \frac{\partial p}{\partial P} \quad \text{……}(\star) $$
+  </div>
+
+  <div class="card">
+    <h3>前前提：2×2 のヤコビアン（行列式）の計算方法</h3>
+    <p>ヤコビアン \(\dfrac{\partial(A,B)}{\partial(c,d)}\) は、偏微分を並べた \(2\times2\) の行列式（デタミナント）のことです。</p>
+    $$ \frac{\partial(A,B)}{\partial(c,d)} = \begin{vmatrix}\dfrac{\partial A}{\partial c} & \dfrac{\partial A}{\partial d}\\[6pt] \dfrac{\partial B}{\partial c} & \dfrac{\partial B}{\partial d}\end{vmatrix} $$
+    <p>行列式の計算公式は、たすき掛けの引き算 \(\begin{vmatrix}a&b\\c&d\end{vmatrix}=ad-bc\) です。</p>
+
+    <h3>分子のヤコビアンの計算</h3>
+    <p>計算したいのは \(\dfrac{\partial(X,P)}{\partial(x,P)}\) です。これは「変数 \((X,P)\) を、変数 \((x,P)\) で偏微分した行列式」という意味です。定義通りに行列をつくってみます：</p>
+    $$ \frac{\partial(X,P)}{\partial(x,P)} = \begin{vmatrix}\dfrac{\partial X}{\partial x} & \dfrac{\partial X}{\partial P}\\[6pt] \dfrac{\partial P}{\partial x} & \dfrac{\partial P}{\partial P}\end{vmatrix} $$
+    <p>ここで、右側の列（\(P\) に関する偏微分）に注目します。中間変数として選んだ組は \((x,P)\) なので、\(x\) と \(P\) は独立な変数として扱います。</p>
+    <ol>
+      <li>右上：\(\dfrac{\partial X}{\partial P}\) — ここはそのまま置いておきます（あとで消えるためです）。</li>
+      <li>右下：\(\dfrac{\partial P}{\partial P}\) — 「\(P\) を \(P\) で偏微分する」ので、答えは1です。</li>
+      <li>左下：\(\dfrac{\partial P}{\partial x}\) — 「\(x\) と \(P\) は互いに独立な変数」なので、\(x\) を動かしても \(P\) は変化しません。したがって、\(P\) を \(x\) で偏微分すると0になります。</li>
+    </ol>
+    <p>これらを元の行列式に代入すると：</p>
+    $$ \begin{vmatrix}\dfrac{\partial X}{\partial x} & \dfrac{\partial X}{\partial P}\\ 0 & 1\end{vmatrix} $$
+    <p>この行列式を \(ad-bc\) で計算すると：</p>
+    $$ \left(\frac{\partial X}{\partial x}\times1\right) - \left(\frac{\partial X}{\partial P}\times0\right) = \frac{\partial X}{\partial x} $$
+    <p>となり、分子のヤコビアンは \(\dfrac{\partial X}{\partial x}\) になることが分かります。</p>
+  </div>
+
+  <div class="card">
+    <h3>分母のヤコビアンの計算</h3>
+    <p>次に、分母の \(\dfrac{\partial(x,p)}{\partial(x,P)}\) を計算します。これは「変数 \((x,p)\) を、変数 \((x,P)\) で偏微分した行列式」です。定義通りに行列をつくります：</p>
+    $$ \frac{\partial(x,p)}{\partial(x,P)} = \begin{vmatrix}\dfrac{\partial x}{\partial x} & \dfrac{\partial x}{\partial P}\\[6pt] \dfrac{\partial p}{\partial x} & \dfrac{\partial p}{\partial P}\end{vmatrix} $$
+    <p>先ほどと同様に、\(x\) についての偏微分（左側の列）に注目します：</p>
+    <ol>
+      <li>左上：\(\dfrac{\partial x}{\partial x}\) — 「\(x\) を \(x\) で偏微分する」ので1です。</li>
+      <li>左下：\(\dfrac{\partial p}{\partial x}\) — ここはそのまま置いておきます。</li>
+      <li>右上：\(\dfrac{\partial x}{\partial P}\) — \(x\) と \(P\) は独立なので、\(x\) は \(P\) に依存しません。したがって \(P\) で偏微分すると0です。</li>
+    </ol>
+    <p>これらを代入すると：</p>
+    $$ \begin{vmatrix}1 & 0\\ \dfrac{\partial p}{\partial x} & \dfrac{\partial p}{\partial P}\end{vmatrix} $$
+    <p>この行列式を \(ad-bc\) で計算すると：</p>
+    $$ \left(1\times\frac{\partial p}{\partial P}\right) - \left(0\times\frac{\partial p}{\partial x}\right) = \frac{\partial p}{\partial P} $$
+    <p>となり、分母のヤコビアンは \(\dfrac{\partial p}{\partial P}\) になることが分かります。</p>
+  </div>
+
+  <div class="card">
+    <h3>③のまとめと最後の仕上げ</h3>
+    <p>ここまでの計算で、以下の2つが得られました：</p>
+    <ul>
+      <li>分子：\(\dfrac{\partial(X,P)}{\partial(x,P)} = \dfrac{\partial X}{\partial x}\)</li>
+      <li>分母：\(\dfrac{\partial(x,p)}{\partial(x,P)} = \dfrac{\partial p}{\partial P}\)</li>
+    </ul>
+    <p>よって、全体のヤコビアン \(J\) は次のように書けます：</p>
+    $$ J = \frac{\text{分子}}{\text{分母}} = \frac{\dfrac{\partial X}{\partial x}}{\dfrac{\partial p}{\partial P}} $$
+    <p>ここで、ステップ②で導いた関係式 \((\star)\) である \(\dfrac{\partial X}{\partial x}=\dfrac{\partial p}{\partial P}\) を使います。分子と分母が全く同じ値になるため、約分されて \(J=1\) となります。</p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
